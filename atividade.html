@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividade: API "catAPI"</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        .document-body {
+            box-sizing: border-box;
+            font-family: 'Quicksand', Arial, Helvetica, 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+        }
+        .document-body * {
+            box-sizing: inherit;
+        }
+        .main-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            gap: 1rem;
+            position: relative;
+        }
+        .main-section > .title {
+            color: #f03;
+        }
+        .main-section > .figure {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            height: 65vw;
+            max-height: 70vh;
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
+        .main-section > .figure.-hidden {
+            opacity: 0;
+        }
+        .main-section > .figure > .img {
+            overflow: hidden;
+            border-radius: 1rem;
+            background-color: hsl(280, 22%, 90%);
+            box-shadow: 0 0 24px #ccc;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .main-section > .button {
+            display: block;
+            padding: 1em 1.25em;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 0.2em;
+            color: #fff;
+            background-color: #f03;
+            border-radius: 3em;
+            box-shadow: 0 0 16px hsl(348, 100%, 50%, 0.5);
+        }
+
+        .main-section > .button:hover {
+            box-shadow: 0 0 24px hsl(348, 100%, 50%, 0.5);
+            text-shadow: 0 0 8px hsl(348, 100%, 80%);
+        }
+
+
+        /* loading... */
+        .ani-heart {
+            display: inline-block;
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            transform: rotate(45deg);
+            transform-origin: 40px 40px;
+            --ani-heart-color: #f03;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+        .ani-heart.-visible {
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
+        .ani-heart div {
+            top: 32px;
+            left: 32px;
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: var(--ani-heart-color);
+            animation: ani-heart 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+            opacity: 0.75;
+        }
+        .ani-heart div:after,
+        .ani-heart div:before {
+            content: " ";
+            position: absolute;
+            display: block;
+            width: 32px;
+            height: 32px;
+            background: var(--ani-heart-color);
+        }
+        .ani-heart div:before {
+            left: -24px;
+            border-radius: 50% 0 0 50%;
+        }
+        .ani-heart div:after {
+            top: -24px;
+            border-radius: 50% 50% 0 0;
+        }
+        @keyframes ani-heart {
+            0% {transform: scale(0.95);}
+            5% {transform: scale(1.1);}
+            39% {transform: scale(0.85);}
+            45% {transform: scale(1);}
+            60% {transform: scale(0.95);}
+            100% {transform: scale(0.9);}
+        }
+    </style>
+
+</head>
+<body class="document-body">
+
+
+    <section class="main-section">
+        <h1 class="title">Just... cats!</h1>
+
+        <figure class="figure">
+            <img class="img" src="./api-cats.gif" alt="Preview de apiCats">
+        </figure>
+
+        <a href="#" class="button">Change cat</a>
+
+        <div class="ani-heart"><div></div></div>
+    </section>
+
+
+<script>
+    const CATS_API_URL = 'https://thatcopy.pw/catapi/rest/';
+
+    const figure = document.querySelector('.main-section .figure');
+    figure.show = function(){this.classList.remove('-hidden');}
+    figure.hide = function(){this.classList.add('-hidden');}
+
+    const loadingBlock = document.querySelector('.ani-heart');
+
+    loadingBlock.show = function(){this.classList.add('-visible');}
+    loadingBlock.hide = function(){this.classList.remove('-visible');}
+
+    const figureImg = document.querySelector('.main-section .figure > .img');
+    figureImg.addEventListener('load', event => {
+        figure.show();
+        loadingBlock.hide();
+    });
+
+    const changeCatBtn = document.querySelector('.button');
+
+    changeCatBtn.addEventListener('click', function(event){
+        event.preventDefault();
+        replaceCatImg();
+    });
+
+
+    const getCatsImgSrc = async () => {
+        // try {
+        //     const response = await fetch(CATS_API_URL);
+        //     const jsonData = await response.json();
+        //     return jsonData.webpurl;
+        // }
+        // catch (exception){
+        //     console.log(exception.message);
+        // }
+
+        const catsApiJsonData = await fetch(CATS_API_URL)
+            .then(response => response.json())
+            .catch(exception => console.log(exception.message));
+
+        return catsApiJsonData.webpurl;
+    }
+
+    const replaceCatImg = async () => {
+        figure.hide();
+        loadingBlock.show();
+        figureImg.src = await getCatsImgSrc();
+    }
+
+
+    replaceCatImg();
+
+
+</script>
+</body>
+</html>
