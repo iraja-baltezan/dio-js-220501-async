@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async/Await - dio-js-220501-async</title>
+</head>
+<body>
+
+    <script>
+        const hr = (title='', char='-') => console.log(`${char.repeat(40)}\n${title}\n${char.repeat(40)}`);
+
+
+        // ---------------------------------------------------------------------
+        // Funções assíncronas necessitam das palavras async e await
+
+        async function resolvePromise(){
+            const aPromise = new Promise((resolve, reject) => {
+                window.setTimeout(() => {
+                    const randomNum = Math.random();
+                    if (randomNum > 0.5) resolve('Agora sim!')
+                    else reject('Agora não!');
+                }, 2000);
+            });
+
+            const result = await aPromise
+                .then(
+                    v=>{
+                        hr('Promise encadeada');
+                        console.log('then fulfilled', v);
+                        return v.toLowerCase();
+                    }
+                    // ,
+                    // reason=>console.log('then reject', reason)
+                )
+                .then(v=>{
+                    console.log('then2 fulfilled', v);
+                    return `>| ${v} |<`;
+                })
+                .catch(reason=>{
+                    hr('Promise encadeada');
+                    console.log('catch reject', reason);
+                    return reason;
+                });
+            return result;
+        }
+
+        const resultado = resolvePromise();
+
+        console.log('resolvePromise() =>', resultado);
+
+
+
+    </script>
+</body>
+</html>
