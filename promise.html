@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise - dio-js-220501-async</title>
+</head>
+<body>
+
+    <script>
+        const hr = (title='', char='-') => console.log(`${char.repeat(40)}\n${title}\n${char.repeat(40)}`);
+
+        // ---------------------------------------------------------------------
+
+        const aPromise = new Promise((resolve, reject) => {
+            window.setTimeout(() => {
+                const randomNum = Math.random();
+                if (randomNum > 0.5) resolve('Agora sim!')
+                else reject('Agora não!');
+            }, 2000);
+        });
+
+        aPromise
+            .then(
+                v=>{
+                    hr('Promise encadeada');
+                    console.log('then fulfilled', v);
+                    return v.toLowerCase();
+                }
+                // ,
+                // reason=>console.log('then reject', reason)
+            )
+            .then(v=>{
+                console.log('then2 fulfilled', v);
+            })
+            .catch(reason=>{
+                hr('Promise encadeada');
+                console.log('catch reject', reason)
+            });
+
+
+        // ---------------------------------------------------------------------
+
+        const p2 = new Promise((resolve, reject)=>{
+            resolve('P2 resolvida!');
+        });
+        const p3 = new Promise((resolve, reject)=>{
+            resolve('P3 resolvida!');
+        });
+        const resolveAll = Promise.all([aPromise, p2, p3])
+            .then(data=>{
+                hr('Resolver várias promises');
+                console.log('Promise all then data:', data);
+            })
+            .catch(reason=>{
+                hr('Resolver várias promises');
+                console.log('catch reject', reason)
+            });
+
+        // ---------------------------------------------------------------------
+        const p4 = new Promise((resolve, reject)=>{
+            resolve('P4 resolvida!');
+        });
+        const resolveAllRace = Promise.race([aPromise, p2, p3, p4])
+            .then(data=>{
+                hr('Resolver varias promises com race');
+                console.log('Promise race then data:', data);
+            })
+            .catch(reason=>{
+                hr('Resolver varias promises com race');
+                console.log('catch reject', reason)
+            });
+
+        // ---------------------------------------------------------------------
+        // Fetch request na API do Github
+        // Fetch API
+
+        const usrName = 'iraja-baltezan';
+
+        fetch(`https://api.github.com/users/${usrName}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/vnd.github.v3+json'
+            }
+        })
+        .then(response => {
+            hr('Fetch request na API do Github');
+            console.log(typeof response);
+            console.log(response);
+            return response.json();
+        })
+        .then(jsonData=>{
+            console.log(jsonData);
+        })
+        .catch(reason=>{
+            hr('Fetch request na API do Github');
+            console.log('catch reject', reason)
+        });
+
+
+    </script>
+</body>
+</html>
